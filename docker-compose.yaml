@@ -1,0 +1,38 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    env_file:
+      - .env
+    command: >
+      --auth
+      --wiredTigerCacheSizeGB 1
+      --setParameter maxTransactionLockRequestTimeoutMillis=5000
+      --quiet
+      --syslog
+    ulimits:
+      nofile:
+        soft: 64000
+        hard: 64000
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+
+volumes:
+  mongo_data:
