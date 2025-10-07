@@ -1,3 +1,4 @@
+import json
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
@@ -22,6 +23,30 @@ def get_mongo_db():
     client = get_mongo_client()
     db_name = get_env_var("MONGO_DB")
     return client[db_name]
+
+def insert_courses(json_path):
+    """Read course data from a JSON file and insert into the 'courses' collection."""
+    # Check file exists
+    if not os.path.exists(json_path):
+        raise FileNotFoundError(f"JSON file not found: {json_path}")
+
+    # Read JSON data
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    # Validate JSON structure
+    if not isinstance(data, list):
+        raise ValueError("JSON must contain a list of course objects")
+
+    if not all(isinstance(course, dict) for course in data):
+        raise ValueError("Each item in the JSON must be a dictionary")
+
+    # Insert into MongoDB
+    db = get_mongo_db()
+    result = db.courses.insert_many(data)
+    print(f"✅ Inserted {len(result.inserted_ids)} courses into MongoDB.")
+
+    return result.inserted_ids
 
 def assert_api_key(provided_key: str):
     """Validate the API key, raise if invalid."""

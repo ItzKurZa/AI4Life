@@ -2,8 +2,8 @@ FROM python:3.11-slim
 
 WORKDIR /processor
 
-# Copy (or mount) requirements
-COPY ../requirements.txt /processor/requirements.txt
+# Copy requirements from project root
+COPY requirements.txt /processor/requirements.txt
 RUN pip install --no-cache-dir -r /processor/requirements.txt
 
 # Copy the processor code
