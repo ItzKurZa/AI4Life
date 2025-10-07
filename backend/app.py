@@ -1,7 +1,7 @@
 import os
 import subprocess
 from fastapi import FastAPI, HTTPException
-from utils import get_mongo_db, assert_api_key, insert_courses
+from utils import get_mongo_db, assert_api_key, insert_courses, get_host_mount_path
 
 app = FastAPI()
 
@@ -18,17 +18,18 @@ def save_data(api_key: str):
     assert_api_key(api_key)
 
     # 2️⃣ Define input/output paths (relative to your project root)
-    input_file = "processor/ingest_data/raw/input.xlsx"
-    output_file = "processor/ingest_data/output/processed.json"
+    input_file = "ingest_data/raw/input.xlsx"
+    output_file = "processor/ingest_data/cleaned/courses_by_class.json"
+
+    backend_mount_path = get_host_mount_path()
 
     # 3️⃣ Run the Docker container
     command = [
-        "docker", "run", "--rm",
-        "-v", f"{os.getcwd()}:/project",  # Mount current workspace
-        "-w", "/project/processor",       # Work inside /processor
-        "course-data-processor",
-        "--input", input_file,
-        "--output", output_file           # Make sure your processor supports this flag
+    "docker", "run", "--rm",
+    "-v", f"{backend_mount_path}:/app",   # host-level path
+    "-w", "/app/processor",
+    "course-data-processor",
+    "--input", input_file,
     ]
 
     try:
