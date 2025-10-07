@@ -5,6 +5,15 @@ from pymongo import MongoClient
 
 load_dotenv()
 
+def get_host_mount_path():
+    """
+    Returns the correct host path for mounting depending on where the code runs.
+    """
+    if os.path.exists("/.dockerenv"):
+        return os.environ.get("HOST_PROJECT_PATH", "/workspaces/codespaces-blank/backend")
+    else:
+        return os.path.join(os.getcwd(), "backend")
+
 def get_env_var(name: str, default=None):
     """Helper to fetch environment variables, optionally with a default."""
     val = os.getenv(name, default)
@@ -56,12 +65,3 @@ def assert_api_key(provided_key: str):
     if provided_key != real:
         from fastapi import HTTPException
         raise HTTPException(status_code=403, detail="Invalid API key")
-
-def get_host_mount_path():
-    """
-    Returns the correct host path for mounting depending on where the code runs.
-    """
-    if os.path.exists("/.dockerenv"):
-        return os.environ.get("HOST_PROJECT_PATH", "/workspaces/codespaces-blank/backend")
-    else:
-        return os.path.join(os.getcwd(), "backend")

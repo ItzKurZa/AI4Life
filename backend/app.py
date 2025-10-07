@@ -27,9 +27,8 @@ def save_data(api_key: str):
     command = [
     "docker", "run", "--rm",
     "-v", f"{backend_mount_path}:/app",   # host-level path
-    "-w", "/app/processor",
     "course-data-processor",
-    "--input", input_file,
+    "--input", input_file,      # make sure it's container path
     ]
 
     try:
@@ -55,8 +54,3 @@ def save_data(api_key: str):
     except Exception as e:
         print("❌ Unexpected error:", e)
         raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/courses")
-def get_courses():
-    courses = list(db.courses.find({}, {"_id": 0}))
-    return {"data": courses}

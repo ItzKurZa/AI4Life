@@ -63,7 +63,7 @@ API_KEY=your_secure_api_key
 3. Build and start the containers:
 
 ```bash
-
+docker build -t course-data-processor -f backend/processor/Dockerfile .
 
 docker compose up --build
 ```
